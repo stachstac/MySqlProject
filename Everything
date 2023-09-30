@@ -1,0 +1,233 @@
+Tabele i dane: 
+CREATE TABLE pole_semantyczne (
+id_pola int identity(1,1) PRIMARY KEY,
+nazwa varchar (255) not null unique,
+);
+
+CREATE TABLE pola_walencyjne (
+id_v int identity(1,1) PRIMARY KEY,
+amount int check (amount<=4),
+t_1 varchar (255) default 'direct object (Acc)',
+t_2 varchar (255) default 'indirect object (Dat)',
+t_3 varchar (255) default null,
+t_4 varchar (255) default null,
+); 
+
+CREATE TABLE Noun (
+Id_noun int IDENTITY(1,1) PRIMARY KEY,
+definition varchar(255) NOT NULL,
+plural varchar(255),
+id_pola int FOREIGN KEY REFERENCES pole_semantyczne(id_pola),
+);
+
+CREATE TABLE other (
+Id_other int IDENTITY(1,1) PRIMARY KEY,
+definition varchar(255) NOT NULL,
+category varchar(255) NOT NULL default 'adjective',
+id_pola int FOREIGN KEY REFERENCES pole_semantyczne(id_pola),
+);
+
+CREATE TABLE verb (
+Id_verb int IDENTITY(1,1) PRIMARY KEY,
+definition varchar(255) NOT NULL,
+odmiana varchar(255) Not null, 
+przechodniość varchar (255) check (przechodniość='yes' or przechodniość='no'), 
+id_v int FOREIGN KEY REFERENCES pola_walencyjne(id_v),
+id_pola int FOREIGN KEY REFERENCES pole_semantyczne(id_pola),
+);
+
+CREATE TABLE words (
+Id_word int IDENTITY(1,1) PRIMARY KEY,
+id_verb int FOREIGN KEY REFERENCES verb(id_verb),
+id_noun int FOREIGN KEY REFERENCES noun(id_noun),
+id_other int FOREIGN KEY REFERENCES other(id_other),
+word varchar (255) not null unique,
+);
+
+CREATE TABLE czasowniki (
+Id_czasownika int IDENTITY(1,1) PRIMARY KEY,
+id_verb int FOREIGN KEY REFERENCES verb(id_verb),
+definicja varchar(255) NOT NULL,
+odmiana varchar(255) Not null, 
+przechodniość varchar (255) check (przechodniość='yes' or przechodniość='no'), 
+id_v int FOREIGN KEY REFERENCES pola_walencyjne(id_v),
+aspekt varchar (255) not null unique,
+id_pola int FOREIGN KEY REFERENCES pole_semantyczne(id_pola),
+);
+
+CREATE TABLE rzeczowniki (
+Id_rzeczownika int IDENTITY(1,1) PRIMARY KEY,
+id_noun int FOREIGN KEY REFERENCES noun(id_noun),
+definicja varchar(255) NOT NULL,
+odmiana varchar(255),
+rodzaj varchar (255) check (rodzaj='m' or rodzaj='f' or rodzaj='n'),
+id_pola int FOREIGN KEY REFERENCES pole_semantyczne(id_pola),
+);
+
+CREATE TABLE inne (
+Id_inne int IDENTITY(1,1) PRIMARY KEY,
+id_other int FOREIGN KEY REFERENCES other(id_other),
+kategoria varchar(255) NOT NULL default 'przymiotnik',
+definicja varchar(255) NOT NULL,
+odmiana varchar(255),
+id_pola int FOREIGN KEY REFERENCES pole_semantyczne(id_pola),
+);
+
+CREATE TABLE slowa (
+Id_slowa int IDENTITY(1,1) PRIMARY KEY,
+id_czasownika int FOREIGN KEY REFERENCES czasowniki(id_czasownika),
+id_rzeczownika int FOREIGN KEY REFERENCES rzeczowniki(id_rzeczownika),
+id_inne int FOREIGN KEY REFERENCES inne(id_inne),
+slowo varchar (255) not null unique,
+);
+
+INSERT INTO pole_semantyczne (nazwa) VALUES ('cattle')
+INSERT INTO pole_semantyczne (nazwa) VALUES ('bully')
+INSERT INTO pole_semantyczne (nazwa) VALUES ('good')
+INSERT INTO pole_semantyczne (nazwa) VALUES ('wares')
+INSERT INTO pole_semantyczne (nazwa) VALUES ('physical force')
+INSERT INTO pole_semantyczne (nazwa) VALUES ('achieve')
+INSERT INTO pole_semantyczne (nazwa) VALUES ('personalpronomina')
+INSERT INTO pole_semantyczne (nazwa) VALUES ('in an angry manner')
+INSERT INTO pole_semantyczne (nazwa) VALUES ('rascal')
+
+INSERT INTO pola_walencyjne (amount,t_2) VALUES (2,'prepositional object(for)')
+INSERT INTO pola_walencyjne (amount,t_2) VALUES (2,'prepositional object(into)')
+INSERT INTO pola_walencyjne (amount,t_2) VALUES (1,null)
+INSERT INTO pola_walencyjne (amount,t_2) VALUES (2,'indirect object(inst)')
+INSERT INTO pola_walencyjne (amount,t_2) VALUES (2,'prepositional object(do)')
+
+INSERT INTO verb (definition,odmiana,przechodniość,id_v,id_pola) VALUES ('to destroy the resolve or courage of','cowed; cowing; cows'
+,'yes',1,2)
+INSERT INTO verb (definition,odmiana,przechodniość,id_v,id_pola) VALUES ('seek to harm, intimidate, or coerce (someone perceived as vulnerable)','bullied;bullying;bullies'
+,'yes',1,2)
+INSERT INTO verb (definition,odmiana,przechodniość,id_v,id_pola) VALUES ('attempt to persuade or coerce (someone) into doing something','pressured;pressuring;pressures'
+,'yes',2,2)
+INSERT INTO verb (definition,odmiana,przechodniość,id_v,id_pola) VALUES ('achieve high marks in (a test or exam)','aced;acing;aces'
+,'yes',3,6)
+INSERT INTO verb (definition,odmiana,przechodniość,id_v,id_pola) VALUES ('succeed in achieving (something that one has worked for)','attained;attaining;attains'
+,'yes',3,6)
+
+INSERT INTO noun (definition,plural,id_pola) VALUES ('a bull (= male cow) that has had its reproductive organs removed, used in the past for pulling heavy things on farms, or, more generally, any adult of the cattle family','oxen'
+,1)
+INSERT INTO noun (definition,plural,id_pola) VALUES ('a fully grown female animal of a domesticated breed of ox, kept to produce milk or beef','cows',1)
+INSERT INTO noun (definition,plural,id_pola) VALUES ('a person who habitually seeks to harm or intimidate those whom they perceive as vulnerable.','bullies',9)
+INSERT INTO noun (definition,plural,id_pola) VALUES ('merchandise or possessions','goods',4)
+INSERT INTO noun (definition,plural,id_pola) VALUES ('continuous physical force exerted on or against an object by something in contact with it','pressures',5)
+
+INSERT INTO other (definition,category,id_pola) VALUES ('very good; excellent','adjective',3)
+INSERT INTO other (definition,category,id_pola) VALUES ('to be desired or approved of','adjective',3)
+INSERT INTO other (definition,category,id_pola) VALUES ('very good','adjective',3)
+INSERT INTO other (definition,category,id_pola) VALUES ('used to refer to a man, boy, or male animal previously mentioned or easily identified','pronomen',7)
+INSERT INTO other (definition,category,id_pola) VALUES ('in an extremely angry manner','adverb',8)
+
+INSERT INTO words (id_verb,id_noun,id_other,word) VALUES (null,1,null,'ox')
+INSERT INTO words (id_verb,id_noun,id_other,word) VALUES (1,2,null,'cow')
+INSERT INTO words (id_verb,id_noun,id_other,word) VALUES (2,3,1,'bully')
+INSERT INTO words (id_verb,id_noun,id_other,word) VALUES (null,4,2,'good')
+INSERT INTO words (id_verb,id_noun,id_other,word) VALUES (3,5,null,'pressure')
+INSERT INTO words (id_verb,id_noun,id_other,word) VALUES (4,null,3,'ace')
+INSERT INTO words (id_verb,id_noun,id_other,word) VALUES (null,null,4,'he')
+INSERT INTO words (id_verb,id_noun,id_other,word) VALUES (5,null,null,'attain')
+INSERT INTO words (id_verb,id_noun,id_other,word) VALUES (null,null,5,'furiously')
+
+INSERT into czasowniki (definicja,odmiana,przechodniość,id_v,aspekt,id_pola,id_verb) VALUES ('próbować wzbudzić strach i poczucie zagrożenia','zastraszał','yes',3,'zastraszyć',2,1)
+INSERT into czasowniki (definicja,odmiana,przechodniość,id_v,aspekt,id_pola,id_verb) VALUES ('męczyć, nękać; sprawiać komuś dyskomfort, ból fizyczny lub psychiczny','dręczył','yes',4,'zadręczyć',2,2)
+INSERT into czasowniki (definicja,odmiana,przechodniość,id_v,aspekt,id_pola,id_verb) VALUES ('nakłaniać kogoś do zrobienia czegoś; kazać komuś coś zrobić, wywierać nacisk/presję na kogoś','zmuszał','yes',5,'zastraszyć',6,3)
+INSERT into czasowniki (definicja,odmiana,przechodniość,id_v,aspekt,id_pola,id_verb) VALUES ('przystępować do egzaminu lub sprawdzianu','zdawał','yes',3,'zdać',6,4)
+INSERT into czasowniki (definicja,odmiana,przechodniość,id_v,aspekt,id_pola,id_verb) VALUES ('uzyskiwać, osiągać dzięki własnemu wysiłkowi','zdobywał','yes',3,'zdobyć',6,5)
+
+INSERT into rzeczowniki (definicja,odmiana,rodzaj,id_pola,id_noun) VALUES ('dorosły, niesterylizowany samiec bydła hodowlanego, także: bizona, żubra, jelenia, łosia itp.','mianownik byk byki dopełniacz byka byków celownik bykowi bykom biernik byka byki narzędnik bykiem bykami miejscownik byku bykach wołacz byku byki','m',1,1)
+INSERT into rzeczowniki (definicja,odmiana,rodzaj,id_pola,id_noun) VALUES ('dorosła samica bydła domowego','mianownik krowa krowy dopełniacz krowy krów celownik krowie krowom biernik krowę krowy narzędnik krową krowami miejscownik krowie krowach wołacz krowo krowy','f',1,2)
+INSERT into rzeczowniki (definicja,odmiana,rodzaj,id_pola,id_noun) VALUES ('człowiek podły i brutalny','mianownik łobuz łobuzy dopełniacz łobuza łobuzów celownik łobuzowi łobuzom biernik łobuza łobuzów narzędnik łobuzem łobuzami miejscownik łobuzie łobuzach wołacz łobuzie łobuzy','m',9,3)
+INSERT into rzeczowniki (definicja,odmiana,rodzaj,id_pola,id_noun) VALUES ('coś, co może stanowić przedmiot transakcji handlowej','mianownik towar towary dopełniacz towaru towarów celownik towarowi towarom biernik towar towary narzędnik towarem towarami miejscownik towarze towarach wołacz towarze towary','m',4,4)
+INSERT into rzeczowniki (definicja,odmiana,rodzaj,id_pola,id_noun) VALUES ('stosunek siły do powierzchni, na którą działa','mianownik ciśnienie ciśnienia dopełniacz ciśnienia ciśnień celownik ciśnieniu ciśnieniom biernik ciśnienie ciśnienia narzędnik ciśnieniem ciśnieniami miejscownik ciśnieniu ciśnieniach wołacz ciśnienie ciśnienia','n',5,5)
+
+INSERT into inne (kategoria,definicja,odmiana,id_pola,id_other) VALUES ('przymiotnik','o czymś wyjątkowo dobrym, pięknym lub lubianym','wspanialszy, najwspanialszy',3,1)
+INSERT into inne (kategoria,definicja,odmiana,id_pola,id_other) VALUES ('przymiotnik','miły, uczynny, usłużny, szlachetny',null,3,2)
+INSERT into inne (kategoria,definicja,odmiana,id_pola,id_other) VALUES ('przymiotnik','wspaniały, świetny, doskonały','wspanialszy, najwspanialszy',3,3)
+INSERT into inne (kategoria,definicja,odmiana,id_pola,id_other) VALUES ('zaimek','trzecia osoba liczby pojedynczej, rodzaj męski','on,jego,jemu,jego,nim,nim,on',7,4)
+INSERT into inne (kategoria,definicja,odmiana,id_pola,id_other) VALUES ('przysłówek','w sposób wściekły, w sposób wyrażający gniew, złość, wzburzenie','wścieklej, najwścieklej',8,5)
+
+INSERT INTO slowa (id_czasownika,id_rzeczownika,id_inne,slowo) VALUES (null,1,null,'byk')
+INSERT INTO slowa (id_czasownika,id_rzeczownika,id_inne,slowo) VALUES (null,2,null,'krowa')
+INSERT INTO slowa (id_czasownika,id_rzeczownika,id_inne,slowo) VALUES (1,null,null,'zastraszać')
+INSERT INTO slowa (id_czasownika,id_rzeczownika,id_inne,slowo) VALUES (null,3,null,'łobuz')
+INSERT INTO slowa (id_czasownika,id_rzeczownika,id_inne,slowo) VALUES (2,null,null,'dręczyć')
+INSERT INTO slowa (id_czasownika,id_rzeczownika,id_inne,slowo) VALUES (null,null,1,'wspaniały')
+INSERT INTO slowa (id_czasownika,id_rzeczownika,id_inne,slowo) VALUES (null,null,2,'dobry')
+INSERT INTO slowa (id_czasownika,id_rzeczownika,id_inne,slowo) VALUES (null,4,null,'towar')
+INSERT INTO slowa (id_czasownika,id_rzeczownika,id_inne,slowo) VALUES (3,null,null,'zmuszać')
+INSERT INTO slowa (id_czasownika,id_rzeczownika,id_inne,slowo) VALUES (null,5,null,'ciśnienie')
+INSERT INTO slowa (id_czasownika,id_rzeczownika,id_inne,slowo) VALUES (4,null,null,'zdawać')
+INSERT INTO slowa (id_czasownika,id_rzeczownika,id_inne,slowo) VALUES (null,null,3,'super')
+INSERT INTO slowa (id_czasownika,id_rzeczownika,id_inne,slowo) VALUES (null,null,4,'on')
+INSERT INTO slowa (id_czasownika,id_rzeczownika,id_inne,slowo) VALUES (5,null,null,'zdobyć')
+INSERT INTO slowa (id_czasownika,id_rzeczownika,id_inne,slowo) VALUES (null,null,5,'wściekle')
+
+CREATE procedure tlumacz_pl @slowo nvarchar(50)
+AS
+SELECT words.word FROM slowa
+JOIN rzeczowniki ON
+slowa.id_rzeczownika=rzeczowniki.id_rzeczownika
+JOIN Noun ON
+rzeczowniki.id_noun=Noun.id_noun
+JOIN words on
+Noun.id_noun=words.id_noun
+WHERE slowa.slowo=@slowo
+EXEC tlumacz_pl @slowo='byk'
+
+CREATE procedure tlumacz_ang @word nvarchar(50)
+AS
+SELECT slowa.slowo FROM slowa
+JOIN rzeczowniki ON
+slowa.id_rzeczownika=rzeczowniki.id_rzeczownika
+JOIN Noun ON
+rzeczowniki.id_noun=Noun.id_noun
+JOIN words on
+Noun.id_noun=words.id_noun
+WHERE words.word=@word
+EXEC tlumacz_ang @word='ox'
+
+CREATE Function objetosc_slownika2()
+returns integer
+as 
+BEGIN
+DECLARE @ile as integer
+SELECT @ile=(SELECT COUNT(word)
+FROM words)+(SELECT COUNT(slowo)
+FROM slowa)
+return @ile
+end
+SELECT dbo.objetosc_slownika2()
+
+CREATE VIEW [polew] as
+SELECT words.word FROM words JOIN noun on words.id_noun=Noun.id_noun JOIN pole_semantyczne on Noun.id_pola=pole_semantyczne.id_pola where pole_semantyczne.nazwa='cattle'
+UNION
+SELECT slowa.slowo FROM slowa JOIN rzeczowniki ON slowa.id_rzeczownika=rzeczowniki.id_rzeczownika JOIN pole_semantyczne on rzeczowniki.id_pola=pole_semantyczne.id_pola WHERE pole_semantyczne.nazwa='cattle'
+
+CREATE VIEW [walencja] as
+SELECT words.word, pola_walencyjne.amount FROM words JOIN verb on words.id_verb=verb.id_verb JOIN pola_walencyjne on pola_walencyjne.id_v=verb.id_v
+UNION
+SELECT slowa.slowo, pola_walencyjne.amount FROM slowa JOIN czasowniki on slowa.id_czasownika=czasowniki.id_czasownika JOIN pola_walencyjne on czasowniki.id_v=pola_walencyjne.id_v
+CREATE Function iloscpole()
+returns integer
+as 
+BEGIN
+DECLARE @ilosc as integer
+SELECT @ilosc = AVG(amount) FROM [walencja]
+return @ilosc
+end
+SELECT dbo.iloscpole()
+
+CREATE TRIGGER other_insert on inne instead of INSERT
+as BEGIN
+	DECLARE @kategoria varchar (50)
+    DECLARE @definicja varchar (50)
+    DECLARE @odmiana varchar (50)
+    DECLARE @id_pola int
+    DECLARE @id_other int
+    SELECT @kategoria = kategoria, @definicja = definicja, @odmiana = odmiana, @id_pola = id_pola,@id_other = id_other from inserted
+    if @kategoria='przyimek' set @odmiana=null
+    INSERT INTO inne (kategoria,definicja,odmiana,id_pola,id_other) VALUES (@kategoria, @definicja, @odmiana, @id_pola,@id_other)
+end
